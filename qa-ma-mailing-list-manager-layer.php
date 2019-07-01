@@ -9,7 +9,7 @@ class qa_html_theme_layer extends qa_html_theme_base
 			if ($this->template == 'register'){
 				
 				//grab the serialized settings from db and unserialize them (if they exist)
-				$saveSettingsSerialized = qa_opt('ma_mlm_settings');
+				$saveSettingsSerialized = qa_opt('mc_mlm_settings');
 				
 				if ($saveSettingsSerialized == ''){
 					$saveSettings = array();
@@ -28,17 +28,17 @@ class qa_html_theme_layer extends qa_html_theme_base
 							
 							//try to preserve the submited value, if the form was submitted.
 							if (count($_POST)) {
-								$checked = qa_post_text('ma_mlm_mc_list_regsubscribe_' . $listId);
+								$checked = qa_post_text('mailchimp_list_regsubscribe_' . $listId);
 							}else{
 								$checked = isset($listSettings['regprecheck']) ? $listSettings['regprecheck'] : 0;
 							}
 							
-							$this->content['form']['fields']['ma_mlm_mc_list_regsubscribe_' . $listId] = array(
+							$this->content['form']['fields']['mailchimp_list_regsubscribe_' . $listId] = array(
 								'label' => isset($listSettings['regtext']) ? $listSettings['regtext'] : 'Subscribe to the mailing list.',
 								'type' => 'checkbox',
 								'value' => $checked,
 								'error' => '',
-								'tags' => 'NAME="ma_mlm_mc_list_regsubscribe_' . $listId . '"',
+								'tags' => 'NAME="mailchimp_list_regsubscribe_' . $listId . '"',
 							);
 
 							

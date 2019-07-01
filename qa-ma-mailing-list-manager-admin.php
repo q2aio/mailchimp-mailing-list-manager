@@ -1,6 +1,6 @@
 <?php
 
-    class qa_ma_mlm_admin {
+    class qa_mc_mlm_admin {
         
         var $directory;
         var $urltoroot;
@@ -21,7 +21,7 @@
                 //a request for the default value for $option
         function option_default($option)
         {
-            if ($option == 'ma_mlm_settings') {
+            if ($option == 'mc_mlm_settings') {
                 return '';
             }
 		}
@@ -41,7 +41,7 @@
 			$okDisplay = null;
 			
 			//grab the serialized settings from db and unserialize them (if they exist)
-			$optionsSerialized = qa_opt('ma_mlm_settings');
+			$optionsSerialized = qa_opt('mc_mlm_settings');
 
 			if ($optionsSerialized == ''){
 				$this->options = array();
@@ -51,7 +51,7 @@
 			
 			
             //has the save button been pressed?
-            if (qa_clicked('ma_mlm_save_button')) {
+            if (qa_clicked('mc_mlm_save_button')) {
 				$table_exists = qa_db_read_one_value(qa_db_query_sub("SHOW TABLES LIKE '^mamlmConfirm'"),true);
 				if(!$table_exists) {
 					qa_db_query_sub(
@@ -69,10 +69,10 @@
 				//clear out the old options.
 				$this->options = array();
 				
-				$this->options['mc_api_key'] = qa_post_text('ma_mlm_mc_api_key');
+				$this->options['mc_api_key'] = qa_post_text('mailchimp_mlm_api_key');
 				
-				//grab the ma_mlm_mcNewsletterLists and unserialize it so we can loop through
-				$mcNewsletterListsSerializedEncoded = qa_post_text('ma_mlm_mcNewsletterLists');
+				//grab the mc_mlm_mcNewsletterLists and unserialize it so we can loop through
+				$mcNewsletterListsSerializedEncoded = qa_post_text('mc_mlm_mcNewsletterLists');
 				$mcNewsletterListsSerialized = html_entity_decode($mcNewsletterListsSerializedEncoded, ENT_QUOTES, "UTF-8");
 				$this->mcNewsletterLists = unserialize($mcNewsletterListsSerialized);
 				
@@ -81,15 +81,15 @@
 					foreach($this->mcNewsletterLists['list'] as $listId => $listName ){
 
 						//using the listId, save the other fields for this submit
-						$this->options['list'][$listId]['enabled'] = (int)qa_post_text('ma_mlm_mc_list_enabled_' . $listId);
+						$this->options['list'][$listId]['enabled'] = (int)qa_post_text('mailchimp_mlm_list_enabled_' . $listId);
 						$this->options['list'][$listId]['name'] = $listName;
-						$this->options['list'][$listId]['regcheckbox'] = (int)qa_post_text('ma_mlm_mc_list_regcheckbox_' . $listId);
-						$this->options['list'][$listId]['regtext'] = qa_post_text('ma_mlm_mc_list_regtext_' . $listId);
-						$this->options['list'][$listId]['regprecheck'] = (int)qa_post_text('ma_mlm_mc_list_regprecheck_' . $listId);
-						$this->options['list'][$listId]['afterconf'] = (int)qa_post_text('ma_mlm_mc_list_afterconf_' . $listId);
-						$this->options['list'][$listId]['confsend'] = (int)qa_post_text('ma_mlm_mc_list_confsend_' . $listId);
-						$this->options['list'][$listId]['sub_segment'] = (int)qa_post_text('ma_mlm_mc_sub_segment_' . $listId);
-						$this->options['list'][$listId]['tags_list'] = (int)qa_post_text('ma_mlm_mc_tags_list_' . $listId);
+						$this->options['list'][$listId]['regcheckbox'] = (int)qa_post_text('mailchimp_mlm_list_regcheckbox_' . $listId);
+						$this->options['list'][$listId]['regtext'] = qa_post_text('mailchimp_mlm_list_regtext_' . $listId);
+						$this->options['list'][$listId]['regprecheck'] = (int)qa_post_text('mailchimp_mlm_list_regprecheck_' . $listId);
+						$this->options['list'][$listId]['afterconf'] = (int)qa_post_text('mailchimp_mlm_list_afterconf_' . $listId);
+						$this->options['list'][$listId]['confsend'] = (int)qa_post_text('mailchimp_mlm_list_confsend_' . $listId);
+						$this->options['list'][$listId]['sub_segment'] = (int)qa_post_text('mailchimp_mlm_sub_segment_' . $listId);
+						$this->options['list'][$listId]['tags_list'] = qa_post_text('mailchimp_mlm_tags_list_' . $listId);
 					}
 				}
 				
@@ -97,7 +97,7 @@
 				//serialize the array so we can save it as one value in the db
 				$optionsSerialized = serialize($this->options);
 				
-				qa_opt('ma_mlm_settings', $optionsSerialized);
+				qa_opt('mc_mlm_settings', $optionsSerialized);
 				
 				
                 //mark form as saved
@@ -112,7 +112,7 @@
 			
 			
 			//Show the settings if the "Show Settings" is clicked
-			if (qa_clicked('ma_mlm_show_settings')) {
+			if (qa_clicked('mc_mlm_show_settings')) {
 				//show the settings
 				$showSettings = true;
 			}
@@ -126,7 +126,7 @@
 				
 				//Serialize the list array and store it in a hidden field
 				$mcNewsletterListsSerialized = serialize($this->mcNewsletterLists);
-				$form['hidden']['ma_mlm_mcNewsletterLists'] = htmlentities($mcNewsletterListsSerialized, ENT_QUOTES, "UTF-8");
+				$form['hidden']['mc_mlm_mcNewsletterLists'] = htmlentities($mcNewsletterListsSerialized, ENT_QUOTES, "UTF-8");
 
 				//'ok' displays a message above the form. Used here to display a success message if the form has been saved.
 				//files contains an array of field options.
@@ -136,13 +136,13 @@
 							'label' => 'MailChimp.com API Key',
 							'type' => 'textbox',
 							'value' => isset($this->options['mc_api_key']) ? $this->options['mc_api_key'] : '',
-							'tags' => 'NAME="ma_mlm_mc_api_key"',
+							'tags' => 'NAME="mailchimp_mlm_api_key"',
 							'error' => isset($this->mcNewsletterLists['error_message']) ? $this->mcNewsletterLists['error_message'] : ''
 						);
 
 				$form['buttons']['save'] = array(
 							'label' => 'Save Changes',
-							'tags' => 'NAME="ma_mlm_save_button"',
+							'tags' => 'NAME="mc_mlm_save_button"',
 							'note' => '<div style="text-align: left;">To import existing users, you can export <a href="./ma-mlm-export" target="_blank">all emails</a> or <a href="./ma-mlm-export?confirmed=true" target="_blank">only confirmed emails</a> and import them on the <a href="http://MailChimp.com" target="_blank">Mail Chimp</a> website.</div>',
 						);
 
@@ -158,78 +158,74 @@
 					foreach($this->mcNewsletterLists['list'] as $listId => $listName ){
 						//Add the subscribe new members checkbox.
 
-						$form['fields']['ma_mlm_mc_list_enabled_' . $listId] = array(
+						$form['fields']['mailchimp_mlm_list_enabled_' . $listId] = array(
 							'label' => '<span style="font-weight: bold;">Enable: ' . $listName . '</span>',
 							'type' => 'checkbox',
 							'value' => isset($this->options['list'][$listId]['enabled']) ? $this->options['list'][$listId]['enabled'] : 0,
 							'error' => '',
-							'tags' => '" NAME="ma_mlm_mc_list_enabled_' . $listId . '"',
+							'tags' => '" NAME="mailchimp_mlm_list_enabled_' . $listId . '"',
 						);
 
-						$form['fields']['ma_mlm_mc_list_regcheckbox_' . $listId] = array(
+						$form['fields']['mailchimp_mlm_list_regcheckbox_' . $listId] = array(
 							'label' => 'Show checkbox asking user to subscribe while registering. Without a checkbox, all members will be subscribed during registration.',
 							'type' => 'checkbox',
 							'value' => isset($this->options['list'][$listId]['regcheckbox']) ? $this->options['list'][$listId]['regcheckbox'] : 0,
 							'error' => '',
-							'tags' => 'NAME="ma_mlm_mc_list_regcheckbox_' . $listId . '"',
+							'tags' => 'NAME="mailchimp_mlm_list_regcheckbox_' . $listId . '"',
 						);
 						
-						$form['fields']['ma_mlm_mc_list_regtext_' . $listId] = array(
+						$form['fields']['mailchimp_mlm_list_regtext_' . $listId] = array(
 							'label' => 'Text to show next to checkbox while registering.',
 							'type' => 'text',
 							'value' => isset($this->options['list'][$listId]['regtext']) ? $this->options['list'][$listId]['regtext'] : 'Subscribe to the mailing list.',
 							'error' => '',
-							'tags' => 'NAME="ma_mlm_mc_list_regtext_' . $listId . '"',
+							'tags' => 'NAME="mailchimp_mlm_list_regtext_' . $listId . '"',
 						);
 						
-						$form['fields']['ma_mlm_mc_list_regprecheck_' . $listId] = array(
+						$form['fields']['mailchimp_mlm_list_regprecheck_' . $listId] = array(
 							'label' => 'Precheck the registration checkbox.',
 							'type' => 'checkbox',
 							'value' => isset($this->options['list'][$listId]['regprecheck']) ? $this->options['list'][$listId]['regprecheck'] : 0,
 							'error' => '',
-							'tags' => 'NAME="ma_mlm_mc_list_regprecheck_' . $listId . '"',
+							'tags' => 'NAME="mailchimp_mlm_list_regprecheck_' . $listId . '"',
 						);
 
 
-						$form['fields']['ma_mlm_mc_list_afterconf_' . $listId] = array(
+						$form['fields']['mailchimp_mlm_list_afterconf_' . $listId] = array(
 							'label' => 'Only subscribe after member confirms their email when registering.',
 							'type' => 'checkbox',
 							'value' => isset($this->options['list'][$listId]['afterconf']) ? $this->options['list'][$listId]['afterconf'] : 0,
 							'error' => '',
-							'tags' => 'NAME="ma_mlm_mc_list_afterconf_' . $listId . '"',
+							'tags' => 'NAME="mailchimp_mlm_list_afterconf_' . $listId . '"',
 						);
 
-						$form['fields']['ma_mlm_mc_list_confsend_' . $listId] = array(
+						$form['fields']['mailchimp_mlm_list_confsend_' . $listId] = array(
 							'label' => 'Send a confirmation request when adding someone to this list.',
 							'type' => 'checkbox',
 							'value' => isset($this->options['list'][$listId]['confsend']) ? $this->options['list'][$listId]['confsend'] : 0,
 							'error' => '',
-							'tags' => 'NAME="ma_mlm_mc_list_confsend_' . $listId . '"',
+							'tags' => 'NAME="mailchimp_mlm_list_confsend_' . $listId . '"',
 						);
 						
 						$listSegments = $this->mcNewsletterLists[$listId]['segments'];
+
 						if(isset($listSegments) && count($listSegments) > 0){
 							
-							$arrTagsList = array();
-							foreach($listSegments as $listSegmentId => $listSegmentName){
-								array_push($listSegmentName);
-								//$csvlisttags .= $listSegmentName . ",";
-							}
-							
-							$form['fields']['ma_mlm_mc_sub_segment_' . $listId] = array(
+							$form['fields']['mailchimp_mlm_sub_segment_' . $listId] = array(
 								'label' => 'Subscribe users using the tag.',
 								'type' => 'checkbox',
 								'value' => isset($this->options['list'][$listId]['sub_segment']) ? $this->options['list'][$listId]['sub_segment'] : 0,
 								'error' => '',
-								'tags' => 'NAME="ma_mlm_mc_sub_segment_' . $listId . '"',
+								'tags' => 'NAME="mailchimp_mlm_sub_segment_' . $listId . '"',
 							);	
 							
-							$form['fields']['ma_mlm_mc_tags_list_' . $listId] = array(
+							$form['fields']['mailchimp_mlm_tags_list_' . $listId] = array(
 								'label' => 'Tags list: ',
-								'type' => 'text',
-								'value' => implode(',', $listSegments),
+								'type' => 'name',
+								'value' => htmlspecialchars(json_encode($listSegments)),
+								//'value' => implode(',', $listSegments),
 								'error' => '',
-								'tags' => 'NAME="ma_mlm_mc_tags_list_' . $listId . '"',
+								'tags' => 'NAME="mailchimp_mlm_tags_list_' . $listId . '"',
 							);
 							
 						}
@@ -250,7 +246,7 @@
 						'buttons' => array(
 							array(
 								'label' => 'Show settings',
-								'tags' => 'NAME="ma_mlm_show_settings"',
+								'tags' => 'NAME="mc_mlm_show_settings"',
 							),
 						),
 					);
@@ -276,11 +272,17 @@
 
 				//request the list of mailing lists
 				$retval = $api->get('lists');
-
+				
 				//check the response from MC
-				if ($api->errorCode){
+				if (http_response_code() != 200) {
 					$response['success'] = false;
-					$response['error_message'] = "Unable to load lists! Code=".$api->errorCode . ". Msg=" . $api->errorMessage;
+					$response['error_message'] = "Unable to load lists! Code=". $retval['status'] . ". Msg=" . $retval['title'];
+					error_log("Unable to load listSubscribe()!");
+					error_log("Code=".$retval['status']);
+					error_log("Msg=".$retval['title']);
+					error_log("Detail=".$retval['detail']);
+					error_log("Type=".$retval['detail']);
+
 				} else {
 					//We got the list object but is there anything in it?
 					if ($retval['total_items'] == 0) {

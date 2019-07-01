@@ -1,6 +1,6 @@
 <?php
 
-	class qa_ma_mlm_event {
+	class qa_mc_mlm_event {
 		
 		var $directory;
         var $urltoroot;
@@ -32,7 +32,7 @@
 				//Congratulations, we've got a new member.
 				
 				//grab the serialized settings from db and unserialize them (if they exist)
-				$saveSettingsSerialized = qa_opt('ma_mlm_settings');
+				$saveSettingsSerialized = qa_opt('mc_mlm_settings');
 				
 				if ($saveSettingsSerialized == ''){
 					$saveSettings = array();
@@ -44,15 +44,15 @@
 				//Is the Mail Chimp api key set along with settings for a list?
 				if (isset($saveSettings['mc_api_key']) && 
 					isset($saveSettings['list'])) {
-				
+						
 					//loop through and look for an enabled list that also wants to display a checkbox on the registration page
 					foreach($saveSettings['list'] as $listId => $listSettings) {
-
+						
 						//Is this list enabled AND ( 
 						//	(asking for a checkbox on the registration page AND it's been checked?)
 						//  OR is a checkbox not needed and this is an automatic subscription)
 						if ($listSettings['enabled'] && 
-								( ($listSettings['regcheckbox'] && (int)qa_post_text('ma_mlm_mc_list_regsubscribe_' . $listId))
+								( ($listSettings['regcheckbox'] && (int)qa_post_text('mailchimp_list_regsubscribe_' . $listId))
 								|| $listSettings['regcheckbox'] == false) ) {
 							
 							//We have a subscriber. Do we need to wait for them to confirm or can we subscribe them right now?
@@ -70,8 +70,7 @@
 											VALUES (#, NOW(), \'mc\', #, #)',
 										$userid, $listId, $listSettingsSerialized
 									);
-								
-								
+									
 							}else{
 								//No need to wait, subscribe them now.
 								
@@ -106,7 +105,9 @@
 						        $params["replace_interests"] = false;
 						        $params["send_welcome"] = false;
 						        $params["status"] = "subscribed";
-								//return $this->callServer("listSubscribe", $params);
+								//return $this->callServer("listSubscribe", $params
+								
+								$segmentsListArr = json_decode($listSettings['tags_list']);
 								
 								//call the MC api and request the subscribe.
 								//listSubscribe($id, $email_address, $merge_vars=NULL, $email_type='html', $double_optin=true, $update_existing=false, $replace_interests=true, $send_welcome=false)
@@ -117,12 +118,18 @@
 									error_log("Code=".$retval['status']);
 									error_log("Msg=".$retval['title']);
 									error_log("Detail=".$retval['detail']);
-									error_log("Type=".$retval['detail']);
+									error_log("Type=".$retval['type']);
 									die();
 								} else {
 									//Success
 									//echo "Subscribed - look for the confirmation email!\n";
-								}			
+								}
+								
+								// adding a member to the tag
+								foreach($segmentsListArr as $segmentID => $segmentName){
+									$retval = $api->post('lists/' . $listId. '/segments/' . $segmentID . '/members', $params);
+								}
+
 							}
 							
 							
@@ -145,7 +152,7 @@
 				//The new member confirmed.
 				
 				//grab the serialized settings from db and unserialize them (if they exist)
-				$saveSettingsSerialized = qa_opt('ma_mlm_settings');
+				$saveSettingsSerialized = qa_opt('mc_mlm_settings');
 
 				if ($saveSettingsSerialized == ''){
 					$saveSettings = array();

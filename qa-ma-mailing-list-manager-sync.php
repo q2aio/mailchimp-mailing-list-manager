@@ -1,6 +1,6 @@
 <?php
 
-class qa_ma_mlm_sync
+class qa_mc_mlm_sync
 {
 	private $directory;
 	private $urltoroot;
@@ -14,7 +14,7 @@ class qa_ma_mlm_sync
 
 	function match_request( $request )
 	{
-		if ($request=='admin/ma-mlm-sync')
+		if ($request=='admin/mailchimp-sync')
 			return true;
 
 		return false;
