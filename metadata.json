@@ -1,0 +1,13 @@
+{
+	"name": "Mailing List Manager",
+	"description": "Adds your members email addresses to your MailChimp.com list.",
+	"uri": "",
+	"version": "2.0",
+	"date": "2019-07-19",
+	"author": "q2a.io",
+	"author_uri": "https://q2a.io",
+	"license": "GPLv3",
+	"update_uri": "",
+	"min_q2a": "1.7.4",
+	"load_order": "after_db_init"
+}
