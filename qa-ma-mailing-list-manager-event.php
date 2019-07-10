@@ -24,7 +24,7 @@
 			//create the merge_vars for the subscriber ip.
 			$merge_vars = array('OPTIN_IP' => $_SERVER['REMOTE_ADDR']);
 			$merge_fields = array('FNAME' => $userid);
-			$merge_fields['LNAME'] = $userid;
+			$merge_fields['LNAME'] = "";
 			
 			//Is this a registration event?
 			
