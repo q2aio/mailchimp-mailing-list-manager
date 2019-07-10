@@ -143,7 +143,7 @@
 				$form['buttons']['save'] = array(
 							'label' => 'Save Changes',
 							'tags' => 'NAME="mc_mlm_save_button"',
-							'note' => '<div style="text-align: left;">To import existing users, you can export <a href="./ma-mlm-export" target="_blank">all emails</a> or <a href="./ma-mlm-export?confirmed=true" target="_blank">only confirmed emails</a> and import them on the <a href="http://MailChimp.com" target="_blank">Mail Chimp</a> website.</div>',
+							'note' => '<div style="text-align: left;">Sync exising users, you can navigate to <a href="./mailchimp-sync" target="_blank">Mailchimp Sync page</a>.</div>',
 						);
 
 
@@ -207,7 +207,13 @@
 							'tags' => 'NAME="mailchimp_mlm_list_confsend_' . $listId . '"',
 						);
 						
-						$listSegments = $this->mcNewsletterLists[$listId]['segments'];
+						$listSegments = array();
+						
+						if(qa_post_text('mailchimp_mlm_tags_list_' . $listId) == null){
+							$listSegments = $this->mcNewsletterLists[$listId]['segments'];
+						}else{
+							$listSegments = json_decode(qa_post_text('mailchimp_mlm_tags_list_' . $listId));
+						}
 
 						if(isset($listSegments) && count($listSegments) > 0){
 							
